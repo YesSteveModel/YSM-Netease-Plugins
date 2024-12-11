@@ -4,15 +4,22 @@ import configAnimate from "../../assets/resource/config_animate.json";
 import configPreviewAnimation from "../../assets/resource/config_preview_animation.json";
 import {jsToPythonConfig} from "./js_to_python.js";
 
+function getDefaultEntry(entry) {
+    if (entry) {
+        return entry;
+    }
+    return "";
+}
+
 function authorTransform(srcAuthors) {
     let outputAuthors = [];
     for (let author of srcAuthors) {
         let avatarName = pathToName(author["avatar"], false);
         let newAuthor = {
             "avatar": `textures/ui/${avatarName}`,
-            "name": author["name"],
-            "role": author["role"],
-            "comment": author["comment"]
+            "name": getDefaultEntry(author["name"]),
+            "role": getDefaultEntry(author["role"]),
+            "comment": getDefaultEntry(author["comment"])
         };
         outputAuthors.push(newAuthor);
     }
@@ -24,6 +31,10 @@ function screenSortTransform(files) {
     let index = 0;
     let defaultTextureName;
     for (let texture of files["player"]["texture"]) {
+        // 考虑带 PBR 的解析
+        if (typeof texture === "object" && texture["uv"]) {
+            texture = texture["uv"];
+        }
         // 第一个索引名必须为 default
         if (index === 0) {
             screenSort.push("default");
@@ -66,7 +77,7 @@ function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysm
     // 动画控制器列表
     let defaultAnimationController = defaultSkinSwitch["animation_controllers"];
     for (let controller of configAnimationsControllers) {
-        defaultAnimationController.push([controller[0], controller[1]]);
+        defaultAnimationController.push([controller[0], controller[1].replace("%model_id%", modelId)]);
     }
 
     // animate 列表

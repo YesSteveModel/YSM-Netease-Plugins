@@ -16,7 +16,8 @@ export function jsToPythonConfig(obj, forceTuple = false) {
         // 处理数字
         return obj.toString();
     } else if (typeof obj === "string") {
-        // 处理字符串
+        // 处理字符串，替换一些转义字符
+        obj = obj.replaceAll("\n", "");
         return `"${obj}"`;
     } else if (typeof obj === "object") {
         // 处理对象

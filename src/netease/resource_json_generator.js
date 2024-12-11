@@ -21,8 +21,12 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
 
     // 实体文件
     let entityFilePath = pathJoin(resourcePackPath, "entity", `${modelId}.entity.json`);
-    let textureName = pathToName(playerFilesJson["texture"][0], false);
-    entityJsonGenerator(entityFilePath, textureName, modelId);
+    let defaultTexturePath = playerFilesJson["texture"][0];
+    if (typeof defaultTexturePath === "object" && defaultTexturePath["uv"]) {
+        defaultTexturePath = defaultTexturePath["uv"];
+    }
+    let defaultTextureName = pathToName(defaultTexturePath, false);
+    entityJsonGenerator(entityFilePath, defaultTextureName, modelId);
 
     // 模型文件
     let rawModelPath = pathJoin(javaPackPath, playerFilesJson["model"]["main"]);
@@ -35,6 +39,10 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
 
     // 实体材质
     for (let texturePath of playerFilesJson["texture"]) {
+        // 考虑带 PBR 的解析
+        if (typeof texturePath === "object" && texturePath["uv"]) {
+            texturePath = texturePath["uv"];
+        }
         let name = pathToName(texturePath, true);
         let srcTexturePath = pathJoin(javaPackPath, texturePath);
         let destTexturePath = pathJoin(resourcePackPath, "textures", "entity", modelId, name);

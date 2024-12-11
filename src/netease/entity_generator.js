@@ -1,4 +1,4 @@
-export function entityJsonGenerator(entityJsonFilePath, textureName, modelId) {
+export function entityJsonGenerator(entityJsonFilePath, defaultTextureName, modelId) {
     fs.writeFileSync(entityJsonFilePath, compileJSON({
         "format_version": "1.10.0",
         "minecraft:client_entity": {
@@ -8,7 +8,7 @@ export function entityJsonGenerator(entityJsonFilePath, textureName, modelId) {
                     "default": "entity_alphatest"
                 },
                 "textures": {
-                    "default": `textures/entity/${modelId}/${textureName}`
+                    "default": `textures/entity/${modelId}/${defaultTextureName}`
                 },
                 "geometry": {
                     "default": `geometry.${modelId}`

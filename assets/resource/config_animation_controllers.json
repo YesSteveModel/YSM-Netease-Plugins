@@ -1,7 +1,7 @@
 [
   [
     "pre_default_ctl",
-    "controller.animation.ysm.pre_default_qlmimi"
+    "controller.animation.ysm.pre_default_%model_id%"
   ],
   [
     "move_ctl",

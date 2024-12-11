@@ -11,7 +11,7 @@ export function animationControllersGenerator(resourcePackPath, modelId) {
         "format_version": "1.19.0",
         "animation_controllers": {}
     };
-    let preDefaultJson = fileJson[`controller.animation.ysm.pre_default_${modelId}`] = {
+    let preDefaultJson = fileJson["animation_controllers"][`controller.animation.ysm.pre_default_${modelId}`] = {
         "states": {
             "default": {
                 "animations": []
