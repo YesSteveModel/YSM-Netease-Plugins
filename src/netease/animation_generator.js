@@ -1,6 +1,6 @@
 import {join as pathJoin} from "path";
 import allowAnimation from "../../assets/resource/allow_animations.json";
-import {molangReplacer} from "./molang_replacer.js";
+import {catmullRomFrameToLinear, molangReplacer} from "./molang_replacer.js";
 
 /**
  * 生成动画控制器文件，这个动画控制器是给并行动画用的
@@ -100,17 +100,20 @@ export function animationTransformGenerator(srcPath, destPath, modelId, variable
                 if (boneName === "Head") {
                     fixHeadXRotation(bone);
                 }
+                catmullRomFrameToLinear(bone["rotation"]);
             }
             if (bone["position"]) {
                 bone["position"] = molangReplacer(bone["position"], variables);
+                catmullRomFrameToLinear(bone["position"]);
             }
             if (bone["scale"]) {
                 bone["scale"] = molangReplacer(bone["scale"], variables);
+                catmullRomFrameToLinear(bone["scale"]);
             }
         }
         transformAnimations[`animation.${modelId}.${animationName}`] = animation;
         // timeline 动画别忘记处理
-        animation["timeline"] = molangReplacer(animation["timeline"], variables);
+        animation["timeline"] = molangReplacer(animation["timeline"], variables, true);
     }
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
