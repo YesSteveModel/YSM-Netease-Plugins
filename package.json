@@ -1,0 +1,36 @@
+{
+  "type": "module",
+  "name": "ysm-netease-utils",
+  "version": "1.0.0",
+  "min_blockbench_version": "4.0.0",
+  "author": "tartaric_acid",
+  "title": "网易版 YSM 插件",
+  "description": "适用于网易版 YSM 组件开发的插件",
+  "about": "此插件由 Yes Steve Model 官方团队制作，专用于网易版 YSM 组件开发。<br>此插件为免费使用插件，不收取任何授权费！请勿受骗！<br>License: All Rights Reserved",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TartaricAcid/YSM-Netease-Plugins"
+  },
+  "license": "All Rights Reserved",
+  "bugs": {
+    "url": "https://github.com/TartaricAcid/YSM-Netease-Plugins/issues",
+    "email": "baka943@qq.com"
+  },
+  "scripts": {
+    "build": "rollup -c"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-image": "^3.0.3",
+    "@rollup/plugin-json": "latest",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@types/node": "^22.5.4",
+    "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
+    "rollup": "^4.21.2",
+    "rollup-plugin-string": "^3.0.0",
+    "rollup-plugin-vue": "5.0.0",
+    "tslib": "^2.7.0",
+    "vue-template-compiler": "2.7.14"
+  }
+}

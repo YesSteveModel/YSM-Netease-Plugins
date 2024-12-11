@@ -1,0 +1,16 @@
+{
+  "ysm.has_helmet": "query.has_armor_slot(0)",
+  "ysm.has_chest_plate": "query.has_armor_slot(1)",
+  "ysm.has_leggings": "query.has_armor_slot(2)",
+  "ysm.has_boots": "query.has_armor_slot(3)",
+  "ysm.has_mainhand": "query.is_item_equipped(0)",
+  "ysm.has_offhand": "query.is_item_equipped(1)",
+  "ysm.is_riptide": "query.can_damage_nearby_mobs",
+  "ysm.has_elytra": "query.is_item_name_any('slot.armor.chest','minecraft:elytra')",
+  "ysm.head_yaw": "query.head_y_rotation(0)",
+  "-ysm.head_pitch": "query.head_x_rotation(0)",
+  "ysm.head_pitch": "-query.head_x_rotation(0)",
+  "ysm.": "query.mod.ysm_",
+  "q.": "query.",
+  "v.": "variable."
+}
