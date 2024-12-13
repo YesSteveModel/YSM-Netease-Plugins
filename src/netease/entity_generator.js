@@ -21,7 +21,7 @@ export function entityJsonGenerator(entityJsonFilePath, defaultTextureName, mode
                         "variable.ysm_skin = 0.0;",
                         "variable.ysm_gui = 0.0;",
                         "variable.ysm_show = 0.0;",
-                        "variable.ysm_geo = 0.0;",
+                        "variable.ysm_preview = 0.0;",
                         "variable.ysm_light = 0.0;"
                     ]
                 }

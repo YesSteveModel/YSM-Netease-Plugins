@@ -122,13 +122,5 @@
   "first_person_map_hold",
   "first_person_map_hold_attack",
   "first_person_map_hold_off_hand",
-  "first_person_map_hold_main_hand",
-  "extra0",
-  "extra1",
-  "extra2",
-  "extra3",
-  "extra4",
-  "extra5",
-  "extra6",
-  "extra7"
+  "first_person_map_hold_main_hand"
 ]

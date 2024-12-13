@@ -1,4 +1,4 @@
-import java_to_netease_transform from "./java_to_netease_transform.vue";
+import javaToNeteaseTransformVue from "./java_to_netease_transform.vue";
 
 export var javaToNeteaseTransformAction = new Action("ysm_netease_utils.java_to_netease_transform", {
     name: "转换模型到中国版", icon: "fa-file-alt", click: function () {
@@ -11,7 +11,7 @@ export var javaToNeteaseTransformAction = new Action("ysm_netease_utils.java_to_
                         javaToNeteaseTransformDialog: javaToNeteaseTransformDialog
                     };
                 },
-                components: {javaToNeteaseTransformVue: java_to_netease_transform},
+                components: {javaToNeteaseTransformVue: javaToNeteaseTransformVue},
                 template: "<javaToNeteaseTransformVue :javaToNeteaseTransformDialog='javaToNeteaseTransformDialog'/>"
             }
         });

@@ -75,7 +75,18 @@ export default {
             }
             return true;
         },
-        allPackGenerator: function (rootPath, modelId) {
+        getExistAnimations(resourcePackPath) {
+            let existAnimations = [];
+            let mainAnimationsPath = pathJoin(resourcePackPath, "animations");
+            for (let file of fs.readdirSync(mainAnimationsPath)) {
+                let animationFile = fs.readFileSync(pathJoin(mainAnimationsPath, file), "utf-8");
+                let animations = autoParseJSON(animationFile, false)["animations"];
+                if (animations) {
+                    existAnimations = existAnimations.concat(Object.keys(animations));
+                }
+            }
+            return existAnimations;
+        }, allPackGenerator: function (rootPath, modelId) {
             // 读取 ysm.json 文件，获取信息
             let ysmJson = autoParseJSON(fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8"), false);
             // 生成根文件夹
@@ -87,9 +98,11 @@ export default {
             let resourcePackPath = pathJoin(rootPath, "resource_pack");
             resourcePackGenerator(resourcePackPath, modelId);
             // 生成资源
-            resourceJsonGenerator(modelId, ysmJson, resourcePackPath, this.javaPackPath, this.variables);
+            let extraAnimation = resourceJsonGenerator(modelId, ysmJson, resourcePackPath, this.javaPackPath, this.variables);
+            // 获取现有动画列表，用于后续脚本动画的自动补全
+            let existAnimations = this.getExistAnimations(resourcePackPath);
             // 生成脚本
-            modConfigGenerator(pathJoin(scriptsPath, "modConfig.py"), ysmJson, modelId, this.variables);
+            modConfigGenerator(pathJoin(scriptsPath, "modConfig.py"), ysmJson, modelId, this.variables, extraAnimation, existAnimations);
         },
         confirmTransform: function () {
             // 检查输入参数，有问题不进行后续处理

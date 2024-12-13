@@ -39,12 +39,14 @@ export function behaviorPackGenerator(behaviorPackPath, modelId) {
     // 生成相关文件夹
     mkdirSync(behaviorPackPath, {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "BoxData"), {recursive: true});
+    mkdirSync(pathJoin(behaviorPackPath, "entities"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "items"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "loot_tables"), {recursive: true});
-    mkdirSync(pathJoin(behaviorPackPath, "netease_feature_rules"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "netease_features"), {recursive: true});
+    mkdirSync(pathJoin(behaviorPackPath, "netease_feature_rules"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "Parts"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "Presets"), {recursive: true});
+    mkdirSync(pathJoin(behaviorPackPath, "recipes"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "spawn_rules"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "storyline", "level"), {recursive: true});
     mkdirSync(pathJoin(behaviorPackPath, "structures"), {recursive: true});
@@ -139,6 +141,7 @@ export function resourcePackGenerator(resourcePackPath, modelId) {
     mkdirSync(pathJoin(resourcePackPath, "models", "editor_materials"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "effect"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "entity",), {recursive: true});
+    mkdirSync(pathJoin(resourcePackPath, "models", "geometry"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "mesh"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "netease_block"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "skeleton"), {recursive: true});

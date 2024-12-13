@@ -49,7 +49,7 @@ function screenSortTransform(files) {
 }
 
 
-function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson) {
+function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson, extraAnimation, existAnimations) {
     let defaultSkinSwitch = {
         "gui_scale": 1.0,
         "player_scale": 0.8,
@@ -67,12 +67,27 @@ function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysm
     // 动画列表
     let defaultAnimations = defaultSkinSwitch["animations"];
     for (let animation of configAnimations) {
-        let entry = [
-            animation[0],
-            animation[1].replace("%model_id%", modelId)
-        ];
-        defaultAnimations.push(entry);
+        let transformName = animation[1].replace("%model_id%", modelId);
+        if (existAnimations.includes(transformName)) {
+            defaultAnimations.push([animation[0], transformName]);
+        } else {
+            // 左右手改名问题
+            if (animation[0] === "use_righthand" || animation[0] === "use_lefthand") {
+                defaultAnimations.push([animation[0], `animation.commander.${animation[0]}`]);
+            } else {
+                defaultAnimations.push([animation[0], animation[1].replace("%model_id%", "commander")]);
+            }
+        }
     }
+    // 把轮盘动画全加上
+    Object.values(extraAnimation).forEach(value => {
+        let newAnimationName = `animation.${modelId}.${value[1]}`;
+        if (existAnimations.includes(newAnimationName)) {
+            defaultAnimations.push([value[1], newAnimationName]);
+        } else {
+            defaultAnimations.push([value[1], `animation.commander.${value[1]}`]);
+        }
+    });
 
     // 动画控制器列表
     let defaultAnimationController = defaultSkinSwitch["animation_controllers"];
@@ -91,11 +106,12 @@ function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysm
 
     // 轮盘动画
     let defaultExtraAnimation = defaultSkinSwitch["extra"];
-    let srcExtraAnimation = ysmJson["properties"]["extra_animation"];
-    Object.entries(srcExtraAnimation).map(([key, value]) => {
+    Object.values(extraAnimation).map(value => {
+        let displayAnimationName = value[0];
+        let newAnimationName = value[1];
         defaultExtraAnimation.push([
-            value,
-            `/playanimation @s ${key} default 0 \\"query.vertical_speed>0.3||query.ground_speed>0.3||q.is_sneaking\\"`,
+            displayAnimationName,
+            `/playanimation @s ${newAnimationName} default 0 \\"query.vertical_speed>0.3||query.ground_speed>0.3||q.is_sneaking\\"`,
         ]);
     });
 }
@@ -114,7 +130,7 @@ function extraSkinSwitchTransform(screenSort, skinSwitch, modelId) {
     }
 }
 
-export function modConfigGenerator(filePath, ysmJson, modelId, variables) {
+export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraAnimation, existAnimations) {
     let metadata = ysmJson["metadata"];
     let files = ysmJson["files"];
 
@@ -132,7 +148,7 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables) {
 
     // 动画渲染信息
     let skinSwitch = {};
-    defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson);
+    defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson, extraAnimation, existAnimations);
     extraSkinSwitchTransform(screenSort, skinSwitch, modelId);
     configList["skin_switch"] = skinSwitch;
 

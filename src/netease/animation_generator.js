@@ -123,6 +123,76 @@ export function animationTransformGenerator(srcPath, destPath, modelId, variable
     }
     // 写入文件
     fs.writeFileSync(destPath, compileJSON(srcAnimationJson));
+}
+
+export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, modelId, variables) {
+    let extraAnimation = {};
+
+    // 如果 ysm.json 字段定义了额外动画
+    if (ysmJson["properties"] && ysmJson["properties"]["extra_animation"]) {
+        let rawExtraAnimation = ysmJson["properties"]["extra_animation"];
+        let index = 0;
+        for (let key in rawExtraAnimation) {
+            // 原动画名：[轮盘显示名称 新动画名]
+            extraAnimation[key] = [rawExtraAnimation[key], `extra${index}`];
+            index++;
+        }
+    } else {
+        for (let index = 0; index < 8; index++) {
+            extraAnimation[`extra${index}`] = [`extra${index}`, `extra${index}`];
+        }
+    }
+
+    let srcAnimationJson = autoParseJSON(fs.readFileSync(srcPath, "utf-8"), false);
+    // 修改名字后的动画
+    let transformAnimations = {};
+    // 强制修改版本，因为 BlockBench 新版本会换成过于新的
+    srcAnimationJson["format_version"] = "1.8.0";
+    // 开始遍历，并替换 molang，修改动画名，剔除冗余动画
+    for (let animationName in srcAnimationJson["animations"]) {
+        // 删除冗余动画
+        if (!extraAnimation[animationName]) {
+            continue;
+        }
+        // 处理旋转、位移、缩放动画
+        let animation = srcAnimationJson["animations"][animationName];
+        for (let boneName in animation["bones"]) {
+            let bone = animation["bones"][boneName];
+            if (bone["rotation"]) {
+                bone["rotation"] = molangReplacer(bone["rotation"], variables);
+                // 对头部需要单独处理 x 轴的旋转
+                if (boneName === "Head") {
+                    fixHeadXRotation(bone);
+                }
+                catmullRomFrameToLinear(bone["rotation"]);
+            }
+            if (bone["position"]) {
+                bone["position"] = molangReplacer(bone["position"], variables);
+                catmullRomFrameToLinear(bone["position"]);
+            }
+            if (bone["scale"]) {
+                bone["scale"] = molangReplacer(bone["scale"], variables);
+                catmullRomFrameToLinear(bone["scale"]);
+            }
+        }
+        // 如果是 extra 动画
+        if (extraAnimation[animationName]) {
+            let newName = extraAnimation[animationName][1];
+            transformAnimations[`animation.${modelId}.${newName}`] = animation;
+        } else {
+            transformAnimations[`animation.${modelId}.${animationName}`] = animation;
+        }
+        // timeline 动画别忘记处理
+        animation["timeline"] = molangReplacer(animation["timeline"], variables, true);
+    }
+    // 动画替换
+    srcAnimationJson["animations"] = transformAnimations;
+    // 删除多余的 geckolib_format_version 字段
+    if (srcAnimationJson["geckolib_format_version"]) {
+        delete srcAnimationJson["geckolib_format_version"];
+    }
+    // 写入文件
+    fs.writeFileSync(destPath, compileJSON(srcAnimationJson));
     // 返回变量
-    return variables;
+    return extraAnimation;
 }

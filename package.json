@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "ysm-netease-utils",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "min_blockbench_version": "4.0.0",
   "author": "tartaric_acid",
   "title": "网易版 YSM 插件",
@@ -26,11 +26,10 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
     "@types/node": "^22.5.4",
-    "blockbench-types": "https://github.com/SnaveSutit/blockbench-types.git",
+    "blockbench-types": "^4.6.1",
     "rollup": "^4.21.2",
     "rollup-plugin-string": "^3.0.0",
     "rollup-plugin-vue": "5.0.0",
-    "tslib": "^2.7.0",
     "vue-template-compiler": "2.7.14"
   }
 }

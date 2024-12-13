@@ -1,5 +1,9 @@
 import {join as pathJoin} from "path";
-import {animationControllersGenerator, animationTransformGenerator} from "./animation_generator.js";
+import {
+    animationControllersGenerator,
+    animationTransformGenerator,
+    extraAnimationTransformGenerator
+} from "./animation_generator.js";
 import {entityJsonGenerator, entityModelGenerator, entityRenderGenerator} from "./entity_generator.js";
 
 export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPackPath, variables) {
@@ -13,10 +17,10 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
         pathJoin(resourcePackPath, "animations", `${modelId}.main.animation.json`),
         modelId, variables
     );
-    animationTransformGenerator(
+    let extraAnimation = extraAnimationTransformGenerator(
         pathJoin(javaPackPath, playerFilesJson["animation"]["extra"]),
         pathJoin(resourcePackPath, "animations", `${modelId}.extra.animation.json`),
-        modelId, variables
+        ysmJson, modelId, variables
     );
 
     // 实体文件
@@ -59,4 +63,6 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
         fs.copyFile(srcAvatarPath, destAvatarPath, error => {
         });
     }
+
+    return extraAnimation;
 }

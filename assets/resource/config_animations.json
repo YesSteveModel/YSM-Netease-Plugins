@@ -77,11 +77,11 @@
   ],
   [
     "use_righthand",
-    "animation.%model_id%.use_righthand"
+    "animation.%model_id%.use_mainhand"
   ],
   [
     "use_lefthand",
-    "animation.%model_id%.use_lefthand"
+    "animation.%model_id%.use_offhand"
   ],
   [
     "parallel0",
@@ -494,37 +494,5 @@
   [
     "first_person_map_hold_main_hand",
     "animation.fight.ekips"
-  ],
-  [
-    "extra0",
-    "animation.%model_id%.extra0"
-  ],
-  [
-    "extra1",
-    "animation.%model_id%.extra1"
-  ],
-  [
-    "extra2",
-    "animation.%model_id%.extra2"
-  ],
-  [
-    "extra3",
-    "animation.%model_id%.extra3"
-  ],
-  [
-    "extra4",
-    "animation.%model_id%.extra4"
-  ],
-  [
-    "extra5",
-    "animation.%model_id%.extra5"
-  ],
-  [
-    "extra6",
-    "animation.%model_id%.extra6"
-  ],
-  [
-    "extra7",
-    "animation.%model_id%.extra7"
   ]
 ]
