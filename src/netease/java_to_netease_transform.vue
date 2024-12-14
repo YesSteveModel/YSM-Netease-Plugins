@@ -1,9 +1,10 @@
 <script>
-import {join as pathJoin} from "path";
+import {join, join as pathJoin} from "path";
 import {mkdirSync} from "fs";
 import {behaviorPackGenerator, resourcePackGenerator} from "./directory_generator.js";
 import {modConfigGenerator} from "./mod_config_generator.js";
 import {resourceJsonGenerator} from "./resource_json_generator.js";
+import {oldVersionRead} from "./old_version_read.js";
 
 export default {
     name: "java_to_netease_transform",
@@ -19,7 +20,8 @@ export default {
             neteasePackPath: "",
             authorName: "",
             modelName: "",
-            variables: new Set()
+            variables: new Set(),
+            isOldVersion: false
         };
     },
     methods: {
@@ -30,11 +32,18 @@ export default {
             });
             if (packPaths && packPaths[0]) {
                 let ysmFilePath = pathJoin(packPaths[0], "ysm.json");
+                let infoJson = join(packPaths[0], "info.json");
+                let mainJson = join(packPaths[0], "main.json");
                 if (fs.existsSync(ysmFilePath)) {
                     // 检测是否有 ysm.json
                     this.javaPackPath = packPaths[0];
+                    this.isOldVersion = false;
+                } else if (fs.existsSync(infoJson) || fs.existsSync(mainJson)) {
+                    // 检测是否有 info.json 或者 main.json
+                    this.javaPackPath = packPaths[0];
+                    this.isOldVersion = true;
                 } else {
-                    electron.dialog.showErrorBox("提示", "当前模型包内无 ysm.json 文件\n目前插件仅支持转换新版 Java 版 YSM 格式模型");
+                    electron.dialog.showErrorBox("提示", "当前模型包内无 YSM 相关文件\n请检查是否选择错了文件夹！");
                 }
             }
         },
@@ -86,9 +95,17 @@ export default {
                 }
             }
             return existAnimations;
-        }, allPackGenerator: function (rootPath, modelId) {
+        },
+        getYsmJsonInfo() {
+            if (this.isOldVersion) {
+                return oldVersionRead(this.javaPackPath);
+            } else {
+                return autoParseJSON(fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8"), false);
+            }
+        },
+        allPackGenerator: function (rootPath, modelId) {
             // 读取 ysm.json 文件，获取信息
-            let ysmJson = autoParseJSON(fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8"), false);
+            let ysmJson = this.getYsmJsonInfo();
             // 生成根文件夹
             mkdirSync(rootPath, {recursive: true});
             // 行为包生成

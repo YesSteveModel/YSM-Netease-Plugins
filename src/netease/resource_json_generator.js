@@ -55,13 +55,18 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
     }
 
     // 作者头像
-    for (let authors of ysmJson["metadata"]["authors"]) {
-        let avatarPath = authors["avatar"];
-        let name = pathToName(avatarPath, true);
-        let srcAvatarPath = pathJoin(javaPackPath, avatarPath);
-        let destAvatarPath = pathJoin(resourcePackPath, "textures", "ui", name);
-        fs.copyFile(srcAvatarPath, destAvatarPath, error => {
-        });
+    if (ysmJson["metadata"]["authors"]) {
+        for (let authors of ysmJson["metadata"]["authors"]) {
+            let avatarPath = authors["avatar"];
+            if (!avatarPath) {
+                continue;
+            }
+            let name = pathToName(avatarPath, true);
+            let srcAvatarPath = pathJoin(javaPackPath, avatarPath);
+            let destAvatarPath = pathJoin(resourcePackPath, "textures", "ui", modelId, name);
+            fs.copyFile(srcAvatarPath, destAvatarPath, error => {
+            });
+        }
     }
 
     return extraAnimation;

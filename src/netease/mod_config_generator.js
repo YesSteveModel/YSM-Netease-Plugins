@@ -4,23 +4,27 @@ import configAnimate from "../../assets/resource/config_animate.json";
 import configPreviewAnimation from "../../assets/resource/config_preview_animation.json";
 import {jsToPythonConfig} from "./js_to_python.js";
 
-function getDefaultEntry(entry) {
-    if (entry) {
-        return entry;
-    }
-    return "";
-}
 
-function authorTransform(srcAuthors) {
+function authorTransform(srcAuthors, modelId) {
+    if (!srcAuthors) {
+        return [{
+            "name": "???",
+            "role": "",
+            "comment": "",
+        }];
+    }
+
     let outputAuthors = [];
     for (let author of srcAuthors) {
-        let avatarName = pathToName(author["avatar"], false);
         let newAuthor = {
-            "avatar": `textures/ui/${avatarName}`,
-            "name": getDefaultEntry(author["name"]),
-            "role": getDefaultEntry(author["role"]),
-            "comment": getDefaultEntry(author["comment"])
+            "name": author["name"] ?? "???",
+            "role": author["role"] ?? "",
+            "comment": author["comment"] ?? ""
         };
+        if (author["avatar"]) {
+            let avatarName = pathToName(author["avatar"], false);
+            newAuthor["avatar"] = `textures/ui/${modelId}/${avatarName}`;
+        }
         outputAuthors.push(newAuthor);
     }
     return outputAuthors;
@@ -49,7 +53,7 @@ function screenSortTransform(files) {
 }
 
 
-function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson, extraAnimation, existAnimations) {
+function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, extraAnimation, existAnimations) {
     let defaultSkinSwitch = {
         "gui_scale": 1.0,
         "player_scale": 0.8,
@@ -136,11 +140,11 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraA
 
     // 填写基本信息
     let configList = {};
-    configList["text"] = metadata["name"];
+    configList["text"] = metadata["name"] ?? "";
     configList["entityIdentifier"] = `ysm:${modelId}`;
-    configList["tips"] = metadata["tips"];
+    configList["tips"] = metadata["tips"] ?? "";
     configList["gui_render_controller"] = `controller.render.ysm_${modelId}_gui`;
-    configList["authors"] = authorTransform(metadata["authors"]);
+    configList["authors"] = authorTransform(metadata["authors"], modelId);
 
     // 材质信息
     let {screenSort, defaultTextureName} = screenSortTransform(files);
@@ -148,7 +152,7 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraA
 
     // 动画渲染信息
     let skinSwitch = {};
-    defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ysmJson, extraAnimation, existAnimations);
+    defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, extraAnimation, existAnimations);
     extraSkinSwitchTransform(screenSort, skinSwitch, modelId);
     configList["skin_switch"] = skinSwitch;
 

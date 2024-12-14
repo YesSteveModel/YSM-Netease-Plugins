@@ -155,7 +155,7 @@ export function resourcePackGenerator(resourcePackPath, modelId) {
     mkdirSync(pathJoin(resourcePackPath, "textures", "models"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "textures", "particle"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "textures", "sfxs"), {recursive: true});
-    mkdirSync(pathJoin(resourcePackPath, "textures", "ui"), {recursive: true});
+    mkdirSync(pathJoin(resourcePackPath, "textures", "ui", modelId), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "ui"), {recursive: true});
 
     // 生成随机的 pack_manifest.json
