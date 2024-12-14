@@ -3,6 +3,7 @@ import configAnimationsControllers from "../../assets/resource/config_animation_
 import configAnimate from "../../assets/resource/config_animate.json";
 import configPreviewAnimation from "../../assets/resource/config_preview_animation.json";
 import {jsToPythonConfig} from "./js_to_python.js";
+import {fixTextureName} from "./chinese_to_base64.js";
 
 
 function authorTransform(srcAuthors, modelId) {
@@ -22,7 +23,7 @@ function authorTransform(srcAuthors, modelId) {
             "comment": author["comment"] ?? ""
         };
         if (author["avatar"]) {
-            let avatarName = pathToName(author["avatar"], false);
+            let avatarName = fixTextureName(pathToName(author["avatar"], false));
             newAuthor["avatar"] = `textures/ui/${modelId}/${avatarName}`;
         }
         outputAuthors.push(newAuthor);
@@ -42,9 +43,9 @@ function screenSortTransform(files) {
         // 第一个索引名必须为 default
         if (index === 0) {
             screenSort.push("default");
-            defaultTextureName = pathToName(texture, false);
+            defaultTextureName = fixTextureName(pathToName(texture, false));
         } else {
-            let textureName = pathToName(texture, false);
+            let textureName = fixTextureName(pathToName(texture, false));
             screenSort.push(textureName);
         }
         index++;

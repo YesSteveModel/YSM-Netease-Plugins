@@ -5,6 +5,7 @@ import {
     extraAnimationTransformGenerator
 } from "./animation_generator.js";
 import {entityJsonGenerator, entityModelGenerator, entityRenderGenerator} from "./entity_generator.js";
+import {fixTextureName} from "./chinese_to_base64.js";
 
 export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPackPath, variables) {
     // 动画控制器
@@ -29,7 +30,7 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
     if (typeof defaultTexturePath === "object" && defaultTexturePath["uv"]) {
         defaultTexturePath = defaultTexturePath["uv"];
     }
-    let defaultTextureName = pathToName(defaultTexturePath, false);
+    let defaultTextureName = fixTextureName(pathToName(defaultTexturePath, false));
     entityJsonGenerator(entityFilePath, defaultTextureName, modelId);
 
     // 模型文件
@@ -47,7 +48,7 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
         if (typeof texturePath === "object" && texturePath["uv"]) {
             texturePath = texturePath["uv"];
         }
-        let name = pathToName(texturePath, true);
+        let name = fixTextureName(pathToName(texturePath, true));
         let srcTexturePath = pathJoin(javaPackPath, texturePath);
         let destTexturePath = pathJoin(resourcePackPath, "textures", "entity", modelId, name);
         fs.copyFile(srcTexturePath, destTexturePath, error => {
@@ -61,7 +62,7 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
             if (!avatarPath) {
                 continue;
             }
-            let name = pathToName(avatarPath, true);
+            let name = fixTextureName(pathToName(avatarPath, true));
             let srcAvatarPath = pathJoin(javaPackPath, avatarPath);
             let destAvatarPath = pathJoin(resourcePackPath, "textures", "ui", modelId, name);
             fs.copyFile(srcAvatarPath, destAvatarPath, error => {
