@@ -39,8 +39,15 @@ export function molangReplacer(animation, variables, isTimeline = false) {
             variableResult.forEach(v => variables.add(v));
         }
 
+        // 非 timeline，咖啡鱼的脚本会加上分号，先进行剔除
+        if (!isTimeline && animation.charAt(animation.length - 1) === ";") {
+            animation = animation.substring(0, animation.length - 1);
+        }
+
         // 有些有赋值语句的帧，需要给行尾加上分号
-        if (animation.includes("=") && animation.charAt(animation.length - 1) !== ";") {
+        // 但是又要进行判断，避免误伤三目运算符
+        let hasTernaryOperator = /[><!=]=/.test(animation) && animation.includes("?");
+        if (!hasTernaryOperator && animation.includes("=") && animation.charAt(animation.length - 1) !== ";") {
             animation = animation + ";";
         }
         return animation;
