@@ -39,8 +39,8 @@ export function molangReplacer(animation, variables, isTimeline = false) {
             variableResult.forEach(v => variables.add(v));
         }
 
-        // 给行尾加上分号
-        if (animation.charAt(animation.length - 1) !== ";") {
+        // 有些有赋值语句的帧，需要给行尾加上分号
+        if (animation.includes("=") && animation.charAt(animation.length - 1) !== ";") {
             animation = animation + ";";
         }
         return animation;

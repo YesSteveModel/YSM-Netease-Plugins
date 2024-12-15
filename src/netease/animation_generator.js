@@ -78,6 +78,45 @@ function fixHeadXRotation(bone) {
     }
 }
 
+function fixSneakArmAnimations(animation, transformAnimations, modelId, animationName) {
+    let needCutArmBones = ["LeftArm", "RightArm", "LeftForeArm", "RightForeArm"];
+    let armAnimation = {
+        "loop": true,
+        "bones": {}
+    };
+    for (let boneName in animation["bones"]) {
+        if (!needCutArmBones.includes(boneName)) {
+            continue;
+        }
+        armAnimation["bones"][boneName] = animation["bones"][boneName];
+        delete animation["bones"][boneName];
+    }
+    if (animation["animation_length"]) {
+        armAnimation["animation_length"] = animation["animation_length"];
+    }
+    transformAnimations[`animation.${modelId}.${animationName}_arm`] = armAnimation;
+}
+
+function perBoneFix(animation, boneName, variables) {
+    let bone = animation["bones"][boneName];
+    if (bone["rotation"]) {
+        bone["rotation"] = molangReplacer(bone["rotation"], variables);
+        // 对头部需要单独处理 x 轴的旋转
+        if (boneName === "Head") {
+            fixHeadXRotation(bone);
+        }
+        catmullRomFrameToLinear(bone["rotation"]);
+    }
+    if (bone["position"]) {
+        bone["position"] = molangReplacer(bone["position"], variables);
+        catmullRomFrameToLinear(bone["position"]);
+    }
+    if (bone["scale"]) {
+        bone["scale"] = molangReplacer(bone["scale"], variables);
+        catmullRomFrameToLinear(bone["scale"]);
+    }
+}
+
 export function animationTransformGenerator(srcPath, destPath, modelId, variables) {
     let srcAnimationJson = autoParseJSON(fs.readFileSync(srcPath, "utf-8"), false);
     // 修改名字后的动画
@@ -93,27 +132,20 @@ export function animationTransformGenerator(srcPath, destPath, modelId, variable
         // 处理旋转、位移、缩放动画
         let animation = srcAnimationJson["animations"][animationName];
         for (let boneName in animation["bones"]) {
-            let bone = animation["bones"][boneName];
-            if (bone["rotation"]) {
-                bone["rotation"] = molangReplacer(bone["rotation"], variables);
-                // 对头部需要单独处理 x 轴的旋转
-                if (boneName === "Head") {
-                    fixHeadXRotation(bone);
-                }
-                catmullRomFrameToLinear(bone["rotation"]);
-            }
-            if (bone["position"]) {
-                bone["position"] = molangReplacer(bone["position"], variables);
-                catmullRomFrameToLinear(bone["position"]);
-            }
-            if (bone["scale"]) {
-                bone["scale"] = molangReplacer(bone["scale"], variables);
-                catmullRomFrameToLinear(bone["scale"]);
-            }
+            perBoneFix(animation, boneName, variables);
         }
         transformAnimations[`animation.${modelId}.${animationName}`] = animation;
         // timeline 动画别忘记处理
         animation["timeline"] = molangReplacer(animation["timeline"], variables, true);
+        // sneak_arm 动画和 sneaking_arm 动画需要从正常的动画里剪切出来
+        if (animationName === "sneak" || animationName === "sneaking") {
+            fixSneakArmAnimations(animation, transformAnimations, modelId, animationName);
+        }
+        // 这几个必须是循环动画
+        let mustBeLoopAnimations = ["ride", "ride_pig", "boat", "sleep"];
+        if (mustBeLoopAnimations.includes(animationName)) {
+            animation["loop"] = true;
+        }
     }
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
@@ -157,23 +189,7 @@ export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, mod
         // 处理旋转、位移、缩放动画
         let animation = srcAnimationJson["animations"][animationName];
         for (let boneName in animation["bones"]) {
-            let bone = animation["bones"][boneName];
-            if (bone["rotation"]) {
-                bone["rotation"] = molangReplacer(bone["rotation"], variables);
-                // 对头部需要单独处理 x 轴的旋转
-                if (boneName === "Head") {
-                    fixHeadXRotation(bone);
-                }
-                catmullRomFrameToLinear(bone["rotation"]);
-            }
-            if (bone["position"]) {
-                bone["position"] = molangReplacer(bone["position"], variables);
-                catmullRomFrameToLinear(bone["position"]);
-            }
-            if (bone["scale"]) {
-                bone["scale"] = molangReplacer(bone["scale"], variables);
-                catmullRomFrameToLinear(bone["scale"]);
-            }
+            perBoneFix(animation, boneName, variables);
         }
         // 如果是 extra 动画
         if (extraAnimation[animationName]) {
@@ -184,6 +200,8 @@ export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, mod
         }
         // timeline 动画别忘记处理
         animation["timeline"] = molangReplacer(animation["timeline"], variables, true);
+        // 轮盘动画必须要是覆盖状态
+        animation["override_previous_animation"] = true;
     }
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
