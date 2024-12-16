@@ -165,7 +165,7 @@
   ],
   [
     "paperdoll",
-    "animation.empty"
+    "animation.%model_id%.gui"
   ],
   [
     "sleep_fix",

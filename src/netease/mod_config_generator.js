@@ -31,10 +31,33 @@ function authorTransform(srcAuthors, modelId) {
     return outputAuthors;
 }
 
-function screenSortTransform(files) {
+function screenSortTransform(files, ysmJson) {
     let screenSort = [];
     let index = 0;
     let defaultTextureName;
+
+    // 如果在 ysm.json 定义了默认材质
+    if (ysmJson["properties"] && ysmJson["properties"]["default_texture"]) {
+        // 它必须是放在第一个的
+        defaultTextureName = fixTextureName(pathToName(ysmJson["properties"]["default_texture"], false));
+        screenSort.push("default");
+        // 剩下的依次存入
+        for (let texture of files["player"]["texture"]) {
+            // 考虑带 PBR 的解析
+            if (typeof texture === "object" && texture["uv"]) {
+                texture = texture["uv"];
+            }
+            let textureName = fixTextureName(pathToName(texture, false));
+            // 记得排除默认材质
+            if (textureName !== defaultTextureName) {
+                // TODO: 那万一其他材质也叫 default 呢？
+                screenSort.push(textureName);
+            }
+        }
+        return {screenSort, defaultTextureName};
+    }
+
+    // 如果没有定义默认材质
     for (let texture of files["player"]["texture"]) {
         // 考虑带 PBR 的解析
         if (typeof texture === "object" && texture["uv"]) {
@@ -148,7 +171,7 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraA
     configList["authors"] = authorTransform(metadata["authors"], modelId);
 
     // 材质信息
-    let {screenSort, defaultTextureName} = screenSortTransform(files);
+    let {screenSort, defaultTextureName} = screenSortTransform(files, ysmJson);
     configList["screen_sort"] = screenSort;
 
     // 动画渲染信息

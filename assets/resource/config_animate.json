@@ -1,5 +1,9 @@
 [
   [
+    "paperdoll_ctl",
+    "v.is_paperdoll"
+  ],
+  [
     "carryon_ctl",
     "!v.is_first_person"
   ],

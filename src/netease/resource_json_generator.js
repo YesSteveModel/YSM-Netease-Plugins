@@ -13,10 +13,11 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
 
     // 动画文件
     let playerFilesJson = ysmJson["files"]["player"];
+    let guiAnimationName = ysmJson["properties"]["preview_animation"];
     animationTransformGenerator(
         pathJoin(javaPackPath, playerFilesJson["animation"]["main"]),
         pathJoin(resourcePackPath, "animations", `${modelId}.main.animation.json`),
-        modelId, variables
+        modelId, guiAnimationName, variables
     );
     let extraAnimation = extraAnimationTransformGenerator(
         pathJoin(javaPackPath, playerFilesJson["animation"]["extra"]),

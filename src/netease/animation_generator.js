@@ -117,10 +117,39 @@ function perBoneFix(animation, boneName, variables) {
     }
 }
 
-export function animationTransformGenerator(srcPath, destPath, modelId, variables) {
+function handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimations, modelId) {
+    // GUI 动画开始处理，GUI 动画需要把并行动画全部合并成一个
+    let guiAnimations = {
+        "loop": true,
+        "bones": {}
+    };
+    // 先加 pre_parallel 动画
+    for (let i = 0; i < 8; i++) {
+        let name = `pre_parallel${i}`;
+        if (tmpGuiAnimations[name]) {
+            Object.assign(guiAnimations["bones"], tmpGuiAnimations[name]["bones"]);
+        }
+    }
+    // 然后才是 GUI 动画
+    if (guiAnimationName && tmpGuiAnimations[guiAnimationName]) {
+        Object.assign(guiAnimations["bones"], tmpGuiAnimations[guiAnimationName]["bones"]);
+    }
+    // 最后是 parallel 动画
+    for (let i = 0; i < 8; i++) {
+        let name = `parallel${i}`;
+        if (tmpGuiAnimations[name]) {
+            Object.assign(guiAnimations["bones"], tmpGuiAnimations[name]["bones"]);
+        }
+    }
+    transformAnimations[`animation.${modelId}.gui`] = guiAnimations;
+}
+
+export function animationTransformGenerator(srcPath, destPath, modelId, guiAnimationName, variables) {
     let srcAnimationJson = autoParseJSON(fs.readFileSync(srcPath, "utf-8"), false);
     // 修改名字后的动画
     let transformAnimations = {};
+    // 用来临时存储 GUI 动画的变量
+    let tmpGuiAnimations = {};
     // 强制修改版本，因为 BlockBench 新版本会换成过于新的
     srcAnimationJson["format_version"] = "1.8.0";
     // 开始遍历，并替换 molang，修改动画名，剔除冗余动画
@@ -146,7 +175,17 @@ export function animationTransformGenerator(srcPath, destPath, modelId, variable
         if (mustBeLoopAnimations.includes(animationName)) {
             animation["loop"] = true;
         }
+        // 把并行动画存进去
+        if (animationName.includes("parallel")) {
+            tmpGuiAnimations[animationName] = animation;
+        }
+        // 把默认 GUI 动画存进去
+        if (guiAnimationName && animationName === guiAnimationName) {
+            tmpGuiAnimations[guiAnimationName] = animation;
+        }
     }
+    // 处理 GUI 动画
+    handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimations, modelId);
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
     // 删除多余的 geckolib_format_version 字段
@@ -175,7 +214,12 @@ export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, mod
         }
     }
 
+    // 额外动画文件可能不存在，如果不存在，那么就直接返回空
+    if (!fs.existsSync(srcPath)) {
+        return {};
+    }
     let srcAnimationJson = autoParseJSON(fs.readFileSync(srcPath, "utf-8"), false);
+
     // 修改名字后的动画
     let transformAnimations = {};
     // 强制修改版本，因为 BlockBench 新版本会换成过于新的
