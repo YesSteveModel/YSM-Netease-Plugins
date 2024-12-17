@@ -130,7 +130,7 @@ function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, ext
     }
 
     // 渲染控制器
-    defaultSkinSwitch["render_controllers"] = [["controller.render.player.first_person_ysm", ""]];
+    defaultSkinSwitch["render_controllers"] = [[`controller.render.player.ysm_${modelId}_first_person`, ""]];
 
     // 轮盘动画
     let defaultExtraAnimation = defaultSkinSwitch["extra"];
@@ -168,6 +168,7 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraA
     configList["entityIdentifier"] = `ysm:${modelId}`;
     configList["tips"] = metadata["tips"] ?? "";
     configList["gui_render_controller"] = `controller.render.ysm_${modelId}_gui`;
+    configList["preview_parallel"] = `animation.${modelId}.paperdoll`;
     configList["authors"] = authorTransform(metadata["authors"], modelId);
 
     // 材质信息

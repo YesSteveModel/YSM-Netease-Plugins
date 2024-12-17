@@ -40,8 +40,7 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
     entityModelGenerator(rawModelPath, modelFilePath, modelId);
 
     // 渲染控制器
-    let renderFilePath = pathJoin(resourcePackPath, "render_controllers", `ysm_${modelId}_gui.render_controllers.json`);
-    entityRenderGenerator(renderFilePath, modelId);
+    entityRenderGenerator(resourcePackPath, modelFilePath, modelId);
 
     // 实体材质
     for (let texturePath of playerFilesJson["texture"]) {

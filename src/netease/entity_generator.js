@@ -1,3 +1,5 @@
+import {join as pathJoin} from "path";
+
 export function entityJsonGenerator(entityJsonFilePath, defaultTextureName, modelId) {
     fs.writeFileSync(entityJsonFilePath, compileJSON({
         "format_version": "1.10.0",
@@ -34,10 +36,32 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
     let modelJson = autoParseJSON(fs.readFileSync(srcModelPath, "utf-8"), false);
     modelJson["format_version"] = "1.12.0";
     modelJson["minecraft:geometry"][0]["description"]["identifier"] = `geometry.${modelId}`;
+
+    // 给左右手添加定位点
+    let bones = modelJson["minecraft:geometry"][0]["bones"];
+    for (let i = bones.length - 1; i >= 0; i--) {
+        let bone = bones[i];
+        if (bone["name"] === "RightHandLocator") {
+            let newBone = {
+                "name": "rightItem",
+                "parent": "RightHandLocator",
+                "pivot": bone["pivot"]
+            };
+            bones.splice(i + 1, 0, newBone);
+        } else if (bone["name"] === "LeftHandLocator") {
+            let newBone = {
+                "name": "leftItem",
+                "parent": "LeftHandLocator",
+                "pivot": bone["pivot"]
+            };
+            bones.splice(i + 1, 0, newBone);
+        }
+    }
+
     fs.writeFileSync(destModelPath, compileJSON(modelJson));
 }
 
-export function entityRenderGenerator(renderFilePath, modelId) {
+function guiRenderGenerator(modelId, renderFilePath) {
     let renderJson = {
         "format_version": "1.8.0",
         "render_controllers": {}
@@ -56,4 +80,47 @@ export function entityRenderGenerator(renderFilePath, modelId) {
         "textures": ["Array.skins[variable.ysm_skin]"]
     };
     fs.writeFileSync(renderFilePath, compileJSON(renderJson));
+}
+
+function firstPersonRenderGenerator(modelId, modelFilePath, renderFilePath) {
+    let renderJson = {
+        "format_version": "1.8.0",
+        "render_controllers": {}
+    };
+    let firstPersonRender = renderJson["render_controllers"][`controller.render.player.ysm_${modelId}_first_person`] = {
+        "geometry": "Geometry.default",
+        "materials": [{"*": "Material.default"}],
+        "textures": ["Texture.default"],
+        "part_visibility": []
+    };
+
+    // 读取模型文件，获取 RightArm 及其子模型
+    let modelJson = autoParseJSON(fs.readFileSync(modelFilePath, "utf-8"), false);
+    let bones = modelJson["minecraft:geometry"][0]["bones"];
+    let parents = ["RightArm"];
+    for (let bone of bones) {
+        if (bone["parent"] && parents.includes(bone["parent"])) {
+            parents.push(bone["name"]);
+        }
+    }
+
+    let partVisibility = firstPersonRender["part_visibility"];
+    // 隐藏所有骨骼
+    partVisibility.push({"*": false});
+    // 仅显示 RightArm 及其子模型
+    parents.forEach(bone => {
+        let part = {};
+        part[bone] = "q.get_equipped_item_name(0) == ''";
+        partVisibility.push(part);
+    });
+
+    fs.writeFileSync(renderFilePath, compileJSON(renderJson));
+}
+
+export function entityRenderGenerator(resourcePackPath, modelFilePath, modelId) {
+    let guiRenderFilePath = pathJoin(resourcePackPath, "render_controllers", `ysm_${modelId}_gui.render_controllers.json`);
+    guiRenderGenerator(modelId, guiRenderFilePath);
+
+    let firstPersonRenderFilePath = pathJoin(resourcePackPath, "render_controllers", `ysm_${modelId}_first_person.render_controllers.json`);
+    firstPersonRenderGenerator(modelId, modelFilePath, firstPersonRenderFilePath);
 }
