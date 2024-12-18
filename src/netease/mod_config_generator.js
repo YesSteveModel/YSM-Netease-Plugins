@@ -79,6 +79,10 @@ function screenSortTransform(files, ysmJson) {
     let allTextureNames = [];
     if (ysmJson["files"] && ysmJson["files"]["player"] && ysmJson["files"]["player"]["texture"]) {
         ysmJson["files"]["player"]["texture"].forEach(texture => {
+            // 考虑带 PBR 的解析
+            if (typeof texture === "object" && texture["uv"]) {
+                texture = texture["uv"];
+            }
             let textureName = fixTextureName(pathToName(texture, false));
             allTextureNames.push(textureName);
         });

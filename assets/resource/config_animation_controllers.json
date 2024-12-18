@@ -9,7 +9,7 @@
   ],
   [
     "idle_ctl",
-    "controller.animation.ysm.idle"
+    "controller.animation.ysm.idle_%model_id%"
   ],
   [
     "fall_ctl",

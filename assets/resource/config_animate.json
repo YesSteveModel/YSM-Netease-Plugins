@@ -49,7 +49,7 @@
   ],
   [
     "idle_ctl",
-    "!q.is_sneaking&&!v.is_first_person"
+    "!q.is_sneaking&&!v.is_first_person&&!v.is_paperdoll&&q.is_on_ground&&!q.is_moving&&!q.is_in_water&&!query.is_sleeping&&!q.is_riding"
   ],
   [
     "move_ctl",

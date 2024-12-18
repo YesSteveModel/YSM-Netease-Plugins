@@ -11,6 +11,15 @@ export function animationControllersGenerator(resourcePackPath, modelId) {
         "format_version": "1.19.0",
         "animation_controllers": {}
     };
+    // idle 动画
+    fileJson["animation_controllers"][`controller.animation.ysm.idle_${modelId}`] = {
+        "states": {
+            "default": {
+                "animations": ["idle"]
+            }
+        }
+    };
+    // 并行动画
     let preDefaultJson = fileJson["animation_controllers"][`controller.animation.ysm.pre_default_${modelId}`] = {
         "states": {
             "default": {
