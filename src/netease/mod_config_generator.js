@@ -31,33 +31,9 @@ function authorTransform(srcAuthors, modelId) {
     return outputAuthors;
 }
 
-function screenSortTransform(files, ysmJson) {
-    let screenSort = [];
+function screenSortTransformWithoutDefaultTexture(screenSort, files) {
     let index = 0;
     let defaultTextureName;
-
-    // 如果在 ysm.json 定义了默认材质
-    if (ysmJson["properties"] && ysmJson["properties"]["default_texture"]) {
-        // 它必须是放在第一个的
-        defaultTextureName = fixTextureName(pathToName(ysmJson["properties"]["default_texture"], false));
-        screenSort.push("default");
-        // 剩下的依次存入
-        for (let texture of files["player"]["texture"]) {
-            // 考虑带 PBR 的解析
-            if (typeof texture === "object" && texture["uv"]) {
-                texture = texture["uv"];
-            }
-            let textureName = fixTextureName(pathToName(texture, false));
-            // 记得排除默认材质
-            if (textureName !== defaultTextureName) {
-                // TODO: 那万一其他材质也叫 default 呢？
-                screenSort.push(textureName);
-            }
-        }
-        return {screenSort, defaultTextureName};
-    }
-
-    // 如果没有定义默认材质
     for (let texture of files["player"]["texture"]) {
         // 考虑带 PBR 的解析
         if (typeof texture === "object" && texture["uv"]) {
@@ -73,7 +49,57 @@ function screenSortTransform(files, ysmJson) {
         }
         index++;
     }
-    return {screenSort, defaultTextureName};
+    return defaultTextureName;
+}
+
+function screenSortTransformWithDefaultTexture(defaultTextureName, screenSort, files) {
+    // 默认材质必须是放在第一个的
+    screenSort.push("default");
+
+    // 剩下的依次存入
+    for (let texture of files["player"]["texture"]) {
+        // 考虑带 PBR 的解析
+        if (typeof texture === "object" && texture["uv"]) {
+            texture = texture["uv"];
+        }
+        let textureName = fixTextureName(pathToName(texture, false));
+        // 记得排除默认材质
+        if (textureName !== defaultTextureName) {
+            // TODO: 那万一其他材质也叫 default 呢？
+            screenSort.push(textureName);
+        }
+    }
+}
+
+function screenSortTransform(files, ysmJson) {
+    let screenSort = [];
+    let defaultTextureName;
+
+    // 先尝试获取所有的材质名，因为会有美术写的 default_texture 根本就不存在
+    let allTextureNames = [];
+    if (ysmJson["files"] && ysmJson["files"]["player"] && ysmJson["files"]["player"]["texture"]) {
+        ysmJson["files"]["player"]["texture"].forEach(texture => {
+            let textureName = fixTextureName(pathToName(texture, false));
+            allTextureNames.push(textureName);
+        });
+    }
+
+    if (ysmJson["properties"] && ysmJson["properties"]["default_texture"]) {
+        // 如果在 ysm.json 定义了默认材质
+        let defaultTextureName = fixTextureName(pathToName(ysmJson["properties"]["default_texture"], false));
+        // 需要先检测是否存在
+        if (allTextureNames.includes(defaultTextureName)) {
+            screenSortTransformWithDefaultTexture(defaultTextureName, screenSort, files);
+        } else {
+            // 不存在，走默认材质路线
+            defaultTextureName = screenSortTransformWithoutDefaultTexture(screenSort, files);
+        }
+        return {screenSort, defaultTextureName};
+    } else {
+        // 如果没有定义默认材质
+        defaultTextureName = screenSortTransformWithoutDefaultTexture(screenSort, files);
+        return {screenSort, defaultTextureName};
+    }
 }
 
 

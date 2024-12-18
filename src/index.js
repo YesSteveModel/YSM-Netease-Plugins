@@ -1,4 +1,5 @@
 import PACKAGE from "../package.json";
+import aboutHtml from "../assets/about/about.html";
 
 import {javaToNeteaseTransformAction} from "./netease/java_to_netease_transform.js";
 
@@ -6,7 +7,7 @@ BBPlugin.register(PACKAGE.name, {
     title: PACKAGE.title,
     author: PACKAGE.author,
     description: PACKAGE.description,
-    about: PACKAGE.about,
+    about: aboutHtml,
     icon: "card_membership",
     variant: "desktop",
     version: PACKAGE.version,

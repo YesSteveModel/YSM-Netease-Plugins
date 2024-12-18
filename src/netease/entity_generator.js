@@ -37,6 +37,10 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
     modelJson["format_version"] = "1.12.0";
     modelJson["minecraft:geometry"][0]["description"]["identifier"] = `geometry.${modelId}`;
 
+    // 模型需要添加 waist 组
+    let hasWaistBone = false;
+    let upBodyIndex = -1;
+
     // 给左右手添加定位点
     let bones = modelJson["minecraft:geometry"][0]["bones"];
     for (let i = bones.length - 1; i >= 0; i--) {
@@ -55,6 +59,35 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
                 "pivot": bone["pivot"]
             };
             bones.splice(i + 1, 0, newBone);
+        } else if (bone["name"] === "waist") {
+            hasWaistBone = true;
+            Blockbench.notification(
+                "提示：",
+                "当前模型已经包含了 waist 组，插件无法再添加 waist 组"
+            );
+        } else if (bone["name"] === "UpBody") {
+            upBodyIndex = i;
+        }
+    }
+
+    // 添加  waist 组
+    if (!hasWaistBone) {
+        if (upBodyIndex < 0) {
+            Blockbench.notification(
+                "提示：",
+                "当前模型缺少 UpBody 组，插件无法添加 waist 组"
+            );
+        } else if (bones[upBodyIndex]["name"] === "UpBody") {
+            let parent = bones[upBodyIndex]["parent"];
+            bones[upBodyIndex]["parent"] = "waist";
+
+            let waist = {
+                "name": "waist",
+                "parent": parent,
+                "pivot": bones[upBodyIndex]["pivot"]
+            };
+
+            bones.splice(upBodyIndex, 0, waist);
         }
     }
 

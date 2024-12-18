@@ -22,7 +22,10 @@ export default {
         }),
         image(),
         string({
-            include: "**/*.py"
+            include: [
+                "**/*.py",
+                "**/*.html"
+            ]
         })
     ],
     external: ["path"]

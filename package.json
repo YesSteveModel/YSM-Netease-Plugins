@@ -1,12 +1,11 @@
 {
   "type": "module",
   "name": "ysm-netease-utils",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "min_blockbench_version": "4.0.0",
   "author": "tartaric_acid",
   "title": "网易版 YSM 插件",
   "description": "适用于网易版 YSM 组件开发的插件",
-  "about": "此插件由 Yes Steve Model 官方团队制作，专用于网易版 YSM 组件开发。<br>此插件为免费使用插件，不收取任何授权费！请勿受骗！<br>License: All Rights Reserved",
   "repository": {
     "type": "git",
     "url": "https://github.com/TartaricAcid/YSM-Netease-Plugins"
