@@ -4,8 +4,8 @@
   "version": "1.0.10",
   "min_blockbench_version": "4.0.0",
   "author": "tartaric_acid",
-  "title": "网易版 YSM 插件",
-  "description": "适用于网易版 YSM 组件开发的插件",
+  "title": "中国版 YSM 插件",
+  "description": "适用于我的世界中国版 YSM 组件开发的插件",
   "repository": {
     "type": "git",
     "url": "https://github.com/TartaricAcid/YSM-Netease-Plugins"
