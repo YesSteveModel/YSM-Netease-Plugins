@@ -1,4 +1,5 @@
 import molangReplacerTable from "../../assets/replace/molang.json";
+import queryNeedRemoveTable from "../../assets/replace/query_need_remove.json";
 
 /**
  * 将基岩版动画的一个 bone 动画转换
@@ -51,6 +52,32 @@ export function molangReplacer(animation, variables, isTimeline = false) {
             animation = animation + ";";
         }
         return animation;
+    }
+    return animation;
+}
+
+export function molangRemoveVariable(animation) {
+    if (Array.isArray(animation)) {
+        // 如果该动画为数组
+        return animation.map(v => molangRemoveVariable(v));
+    } else if (typeof animation === "object") {
+        // 处理对象
+        for (let key in animation) {
+            // lerp_mode 字段不需要处理
+            if (key !== "lerp_mode") {
+                animation[key] = molangRemoveVariable(animation[key]);
+            }
+        }
+        return animation;
+    } else if (typeof animation === "string") {
+        // 尝试正则匹配 variable. 开头的变量，全部设置为数字 0
+        animation = animation.replaceAll(/(variable\.[\w.]+)/g, "0");
+        // 但是这样会出现 0=0 / 0=0;0=0; 这样的情况，需要剔除
+        animation = animation.replaceAll("0=0", "0");
+        // 一些函数也会导致刷屏，需要剔除
+        queryNeedRemoveTable.forEach(value => {
+            animation = animation.replaceAll(new RegExp(value, "g"), "0");
+        });
     }
     return animation;
 }

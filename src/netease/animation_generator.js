@@ -1,6 +1,6 @@
 import {join as pathJoin} from "path";
 import allowAnimation from "../../assets/resource/allow_animations.json";
-import {catmullRomFrameToLinear, molangReplacer} from "./molang_replacer.js";
+import {catmullRomFrameToLinear, molangRemoveVariable, molangReplacer} from "./molang_replacer.js";
 
 /**
  * 生成动画控制器文件，这个动画控制器是给并行动画用的
@@ -132,6 +132,7 @@ function handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimati
         "loop": true,
         "bones": {}
     };
+
     // 先加 pre_parallel 动画
     for (let i = 0; i < 8; i++) {
         let name = `pre_parallel${i}`;
@@ -150,6 +151,24 @@ function handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimati
             Object.assign(guiAnimations["bones"], tmpGuiAnimations[name]["bones"]);
         }
     }
+
+    // 深拷贝一次，避免影响其他动画
+    guiAnimations = JSON.parse(JSON.stringify(guiAnimations));
+
+    // GUI 动画不支持变量，全部置 0
+    for (let boneName in guiAnimations["bones"]) {
+        let bone = guiAnimations["bones"][boneName];
+        if (bone["rotation"]) {
+            bone["rotation"] = molangRemoveVariable(bone["rotation"]);
+        }
+        if (bone["position"]) {
+            bone["position"] = molangRemoveVariable(bone["position"]);
+        }
+        if (bone["scale"]) {
+            bone["scale"] = molangRemoveVariable(bone["scale"]);
+        }
+    }
+
     transformAnimations[`animation.${modelId}.gui`] = guiAnimations;
 }
 

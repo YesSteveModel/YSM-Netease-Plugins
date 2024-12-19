@@ -107,10 +107,16 @@ function screenSortTransform(files, ysmJson) {
 }
 
 
-function defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, extraAnimation, existAnimations) {
+function defaultSkinSwitchTransform(skinSwitch, ysmJson, modelId, defaultTextureName, extraAnimation, existAnimations) {
+    let heightScale = ysmJson["properties"]?.["height_scale"] ?? 0.7;
+    let widthScale = ysmJson["properties"]?.["width_scale"] ?? 0.7;
+    let playerScale = Math.min(widthScale, heightScale);
+
     let defaultSkinSwitch = {
-        "gui_scale": 1.0,
-        "player_scale": 0.8,
+        "y_offset": 0, // 纸娃娃的上下偏移
+        "main_scale": 0.5, // 纸娃娃的大小缩放
+        "gui_scale": 1.0, // 模型选择界面的大小缩放
+        "player_scale": playerScale, // 玩家整体的大小缩放
         "gui_animation": `animation.${modelId}.gui`,
         "texture": `textures/entity/${modelId}/${defaultTextureName}`,
         "geometry": `geometry.${modelId}`,
@@ -207,7 +213,7 @@ export function modConfigGenerator(filePath, ysmJson, modelId, variables, extraA
 
     // 动画渲染信息
     let skinSwitch = {};
-    defaultSkinSwitchTransform(skinSwitch, modelId, defaultTextureName, extraAnimation, existAnimations);
+    defaultSkinSwitchTransform(skinSwitch, ysmJson, modelId, defaultTextureName, extraAnimation, existAnimations);
     extraSkinSwitchTransform(screenSort, skinSwitch, modelId);
     configList["skin_switch"] = skinSwitch;
 
