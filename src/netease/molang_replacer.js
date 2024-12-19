@@ -26,8 +26,12 @@ export function molangReplacer(animation, variables, isTimeline = false) {
         return animation;
     } else if (typeof animation === "string") {
         // 替换 molang
-        for (let key in molangReplacerTable) {
-            animation = animation.replaceAll(key, molangReplacerTable[key]);
+        for (let key in molangReplacerTable["string"]) {
+            animation = animation.replaceAll(key, molangReplacerTable["string"][key]);
+        }
+        // 正则替换的
+        for (let key in molangReplacerTable["regex"]) {
+            animation = animation.replaceAll(new RegExp(key, "g"), molangReplacerTable["regex"][key]);
         }
 
         // 咖啡鱼写的脚本导致出现了一些 {data} 错误，需要修正
