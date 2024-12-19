@@ -5,6 +5,7 @@ import {behaviorPackGenerator, resourcePackGenerator} from "./directory_generato
 import {modConfigGenerator} from "./mod_config_generator.js";
 import {resourceJsonGenerator} from "./resource_json_generator.js";
 import {oldVersionRead} from "./old_version_read.js";
+import {alphaGlowTextureHandle} from "./alpha_glow_texture_handle.js";
 
 export default {
     name: "java_to_netease_transform",
@@ -20,6 +21,7 @@ export default {
             neteasePackPath: "",
             authorName: "",
             modelName: "",
+            alphaGlowTexture: false,
             variables: new Set(),
             isOldVersion: false
         };
@@ -103,6 +105,17 @@ export default {
                 return autoParseJSON(fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8"), false);
             }
         },
+        handleAlphaGlowTexture(resourcePackPath, modelId) {
+            let modelFilePath = pathJoin(resourcePackPath, "models", "entity", modelId + ".json");
+            let textureFolderPath = pathJoin(resourcePackPath, "textures", "entity", modelId);
+            let texturePaths = [];
+            fs.readdirSync(textureFolderPath).forEach(file => {
+                if (file.endsWith(".png")) {
+                    texturePaths.push(pathJoin(textureFolderPath, file));
+                }
+            });
+            alphaGlowTextureHandle(modelFilePath, texturePaths);
+        },
         allPackGenerator: function (rootPath, modelId) {
             // 读取 ysm.json 文件，获取信息
             let ysmJson = this.getYsmJsonInfo();
@@ -120,6 +133,10 @@ export default {
             let existAnimations = this.getExistAnimations(resourcePackPath);
             // 生成脚本
             modConfigGenerator(pathJoin(scriptsPath, "modConfig.py"), ysmJson, modelId, this.variables, extraAnimation, existAnimations);
+            // 处理泛光贴图
+            if (this.alphaGlowTexture) {
+                this.handleAlphaGlowTexture(resourcePackPath, modelId);
+            }
         },
         confirmTransform: function () {
             // 检查输入参数，有问题不进行后续处理
@@ -159,6 +176,16 @@ export default {
             <p class="main-button-title">模型名：请用小写英文字符和下划线</p>
             <input class="main-input" v-model="modelName"/>
         </div>
+        <div class="main-button-layout" style="display: flex; align-items: center;">
+            <div style="width: 80%">
+                <p class="main-button-title">是否处理成泛光贴图？</p>
+                <p class="main-button-desc">
+                    插件将会把所有以 <code>ysmGlow</code> 开头的组所在的材质替换为 0.2 透明度的贴图，用于在游戏内制作泛光效果。<br>
+                    但是部分情况下可能会导致模型过于明亮！
+                </p>
+            </div>
+            <input class="checkbox" type="checkbox" v-model="alphaGlowTexture"/>
+        </div>
         <div class="main-button-layout">
             <button style="width: 100%" @click="confirmTransform">确认转换</button>
         </div>
@@ -176,10 +203,23 @@ export default {
     margin: 10px auto;
 }
 
+.main-button-desc {
+    width: 100%;
+    margin: 10px auto;
+    font-size: small;
+    color: gray;
+}
+
 .main-input {
     width: 100%;
     background-color: #1c2026;
     border: #000006 solid 1px;
     height: 30px;
+}
+
+.checkbox {
+    width: 10%;
+    margin: 0 auto;
+    transform: scale(1.5);
 }
 </style>

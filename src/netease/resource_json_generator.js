@@ -1,4 +1,5 @@
 import {join as pathJoin} from "path";
+import {promises} from "fs";
 import {
     animationControllersGenerator,
     animationTransformGenerator,
@@ -6,6 +7,7 @@ import {
 } from "./animation_generator.js";
 import {entityJsonGenerator, entityModelGenerator, entityRenderGenerator} from "./entity_generator.js";
 import {fixTextureName} from "./chinese_to_base64.js";
+import {resizeImage} from "./jimp_image_handle.js";
 
 export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPackPath, variables) {
     // 动画控制器
@@ -65,10 +67,15 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
             let name = fixTextureName(pathToName(avatarPath, true));
             let srcAvatarPath = pathJoin(javaPackPath, avatarPath);
             let destAvatarPath = pathJoin(resourcePackPath, "textures", "ui", modelId, name);
-            fs.copyFile(srcAvatarPath, destAvatarPath, error => {
+            handleAuthorAvatar(srcAvatarPath, destAvatarPath).then(ignore => {
             });
         }
     }
 
     return extraAnimation;
+}
+
+async function handleAuthorAvatar(srcAvatarPath, destAvatarPath) {
+    await promises.copyFile(srcAvatarPath, destAvatarPath);
+    await resizeImage(destAvatarPath);
 }
