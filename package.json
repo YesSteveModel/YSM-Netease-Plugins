@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "ysm-netease-utils",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "min_blockbench_version": "4.0.0",
   "author": "tartaric_acid",
   "title": "中国版 YSM 插件",

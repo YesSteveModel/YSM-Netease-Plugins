@@ -214,10 +214,8 @@ export function animationTransformGenerator(srcPath, destPath, modelId, guiAnima
     }
     // 处理 GUI 动画
     handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimations, modelId);
-    // 检查是否有 paperdoll 动画，没有生成一个空动画文件
-    if (!transformAnimations[`animation.${modelId}.paperdoll`]) {
-        transformAnimations[`animation.${modelId}.paperdoll`] = {"loop": true};
-    }
+    // 检查是否有 paperdoll 动画，没有就复用 GUI 动画
+    transformAnimations[`animation.${modelId}.paperdoll`] ??= transformAnimations[`animation.${modelId}.gui`];
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
     // 删除多余的 geckolib_format_version 字段

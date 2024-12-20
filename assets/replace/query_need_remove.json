@@ -1,4 +1,0 @@
-[
-  "query\\.is_item_name_any\\(.*?\\)",
-  "0 = math\\.random\\(0, 0\\);"
-]
