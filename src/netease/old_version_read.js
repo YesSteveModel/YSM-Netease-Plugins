@@ -8,9 +8,9 @@ export function oldVersionRead(packDirectory) {
     let ysmExtraInfo = {};
 
     if (fs.existsSync(infoJson)) {
-        ysmExtraInfo = autoParseJSON(fs.readFileSync(infoJson, {encoding: "utf8"}));
+        ysmExtraInfo = autoParseJSON(fs.readFileSync(infoJson, {encoding: "utf8"}), true);
     } else if (fs.existsSync(mainJson)) {
-        let mainFileJson = autoParseJSON(fs.readFileSync(mainJson, {encoding: "utf8"}));
+        let mainFileJson = autoParseJSON(fs.readFileSync(mainJson, {encoding: "utf8"}), true);
         ysmExtraInfo = mainFileJson["minecraft:geometry"][0]["description"]["ysm_extra_info"];
     }
     if (!ysmExtraInfo) {

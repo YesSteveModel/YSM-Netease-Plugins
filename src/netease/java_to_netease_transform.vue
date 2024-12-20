@@ -1,6 +1,7 @@
 <script>
 import {join, join as pathJoin} from "path";
 import {mkdirSync} from "fs";
+import JSON5 from "json5";
 import {behaviorPackGenerator, resourcePackGenerator} from "./directory_generator.js";
 import {modConfigGenerator} from "./mod_config_generator.js";
 import {resourceJsonGenerator} from "./resource_json_generator.js";
@@ -102,7 +103,17 @@ export default {
             if (this.isOldVersion) {
                 return oldVersionRead(this.javaPackPath);
             } else {
-                return autoParseJSON(fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8"), false);
+                let content = fs.readFileSync(pathJoin(this.javaPackPath, "ysm.json"), "utf-8");
+                let ysmJson;
+                try {
+                    // 因为 BlockBench 自带的 JSON 解析存在 bug，换用 json5 读取
+                    ysmJson = JSON5.parse(content);
+                } catch (err) {
+                    console.error(err);
+                    // 但是 json5 库没法弹窗报错，所以再用 BlockBench 读取一次，弹窗报错
+                    ysmJson = autoParseJSON(content, true);
+                }
+                return ysmJson;
             }
         },
         handleAlphaGlowTexture(resourcePackPath, modelId) {
@@ -119,6 +130,10 @@ export default {
         allPackGenerator: function (rootPath, modelId) {
             // 读取 ysm.json 文件，获取信息
             let ysmJson = this.getYsmJsonInfo();
+            // 有可能有人写错了定义文件导致读取失败，故需要判断
+            if (!ysmJson) {
+                return false;
+            }
             // 生成根文件夹
             mkdirSync(rootPath, {recursive: true});
             // 行为包生成
@@ -137,6 +152,7 @@ export default {
             if (this.alphaGlowTexture) {
                 this.handleAlphaGlowTexture(resourcePackPath, modelId);
             }
+            return true;
         },
         confirmTransform: function () {
             // 检查输入参数，有问题不进行后续处理
@@ -148,11 +164,15 @@ export default {
             // 创建根文件夹
             let rootPath = pathJoin(this.neteasePackPath, modelId);
             // 生成所有的文件
-            this.allPackGenerator(rootPath, modelId);
-            // 提示
-            Blockbench.showQuickMessage(`转换完毕！\n在 ${this.neteasePackPath} 生成了导出后的文件`, 3000);
-            // 关闭窗口
-            this.javaToNeteaseTransformDialog.close();
+            let result = this.allPackGenerator(rootPath, modelId);
+            if (result) {
+                // 成功后才给提示
+                Blockbench.showQuickMessage(`转换完毕！\n在 ${this.neteasePackPath} 生成了导出后的文件`, 3000);
+                // 关闭窗口
+                this.javaToNeteaseTransformDialog.close();
+            } else {
+                Blockbench.notification("警告", "源模型文件读取失败！");
+            }
         },
     }
 };
