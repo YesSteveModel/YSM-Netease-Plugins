@@ -10,7 +10,7 @@
 ## 鸣谢
 
 - 本插件基于 `BlockBench`、`Electron`、`Vue`、`Node.js` 等技术，感谢 `BlockBench` 的作者 `JannisX11`
-- 本插件生成的代码部分基于 `QuModLibs`（[开源协议: BSD](.\assets\python\QuModLibs\Information.py)），感谢作者 `Zero123`（网易:游趣开发组）
+- 本插件生成的代码部分基于 `QuModLibs`（[开源协议: BSD](https://github.com/TartaricAcid/YSM-Netease-Plugins/blob/main/assets/python/QuModLibs/Information.py)），感谢作者 `Zero123`（网易:游趣开发组）
 - 感谢 YSM 中国版的维护团队：葫芦山资源组和棱花制作组
 
 ## 协议
