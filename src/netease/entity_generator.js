@@ -115,7 +115,19 @@ function guiRenderGenerator(modelId, renderFilePath) {
     fs.writeFileSync(renderFilePath, compileJSON(renderJson));
 }
 
-function firstPersonRenderGenerator(modelId, modelFilePath, renderFilePath) {
+function getRightArmBones(modelFilePath) {
+    let modelJson = autoParseJSON(fs.readFileSync(modelFilePath, "utf-8"), false);
+    let bones = modelJson["minecraft:geometry"][0]["bones"];
+    let rightArmBones = ["RightArm"];
+    for (let bone of bones) {
+        if (bone["parent"] && rightArmBones.includes(bone["parent"])) {
+            rightArmBones.push(bone["name"]);
+        }
+    }
+    return rightArmBones;
+}
+
+function firstPersonRenderGenerator(modelId, modelFilePath, renderFilePath, rawArmModelPath) {
     let renderJson = {
         "format_version": "1.8.0",
         "render_controllers": {}
@@ -127,21 +139,18 @@ function firstPersonRenderGenerator(modelId, modelFilePath, renderFilePath) {
         "part_visibility": []
     };
 
-    // 读取模型文件，获取 RightArm 及其子模型
-    let modelJson = autoParseJSON(fs.readFileSync(modelFilePath, "utf-8"), false);
-    let bones = modelJson["minecraft:geometry"][0]["bones"];
-    let parents = ["RightArm"];
-    for (let bone of bones) {
-        if (bone["parent"] && parents.includes(bone["parent"])) {
-            parents.push(bone["name"]);
-        }
-    }
+    // 读取主模型文件，获取 RightArm 及其子模型
+    let mainModelRightArm = getRightArmBones(modelFilePath);
+    // 读取 Arm 模型文件，获取 RightArm 及其子模型
+    let armModelRightArm = getRightArmBones(rawArmModelPath);
+    // 主模型和 arm 模型取交集
+    let intersection = mainModelRightArm.filter(v => armModelRightArm.includes(v));
 
     let partVisibility = firstPersonRender["part_visibility"];
     // 隐藏所有骨骼
     partVisibility.push({"*": false});
     // 仅显示 RightArm 及其子模型
-    parents.forEach(bone => {
+    intersection.forEach(bone => {
         let part = {};
         part[bone] = "q.get_equipped_item_name(0) == ''";
         partVisibility.push(part);
@@ -150,10 +159,10 @@ function firstPersonRenderGenerator(modelId, modelFilePath, renderFilePath) {
     fs.writeFileSync(renderFilePath, compileJSON(renderJson));
 }
 
-export function entityRenderGenerator(resourcePackPath, modelFilePath, modelId) {
+export function entityRenderGenerator(resourcePackPath, modelFilePath, modelId, rawArmModelPath) {
     let guiRenderFilePath = pathJoin(resourcePackPath, "render_controllers", `ysm_${modelId}_gui.render_controllers.json`);
     guiRenderGenerator(modelId, guiRenderFilePath);
 
     let firstPersonRenderFilePath = pathJoin(resourcePackPath, "render_controllers", `ysm_${modelId}_first_person.render_controllers.json`);
-    firstPersonRenderGenerator(modelId, modelFilePath, firstPersonRenderFilePath);
+    firstPersonRenderGenerator(modelId, modelFilePath, firstPersonRenderFilePath, rawArmModelPath);
 }

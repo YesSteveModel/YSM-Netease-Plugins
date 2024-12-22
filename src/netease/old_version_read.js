@@ -34,7 +34,8 @@ export function oldVersionRead(packDirectory) {
         "files": {
             "player": {
                 "model": {
-                    "main": "main.json"
+                    "main": "main.json",
+                    "arm": "arm.json"
                 },
                 "animation": {
                     "main": "main.animation.json",
