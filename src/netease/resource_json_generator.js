@@ -22,7 +22,7 @@ export function resourceJsonGenerator(modelId, ysmJson, resourcePackPath, javaPa
         modelId, guiAnimationName, variables
     );
     let extraAnimation = extraAnimationTransformGenerator(
-        pathJoin(javaPackPath, playerFilesJson["animation"]["extra"]),
+        pathJoin(javaPackPath, playerFilesJson["animation"]["extra"] ?? "extra.json"),
         pathJoin(resourcePackPath, "animations", `${modelId}.extra.animation.json`),
         ysmJson, modelId, variables
     );
