@@ -41,6 +41,10 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
     let hasWaistBone = false;
     let upBodyIndex = -1;
 
+    // 模型需要添加 sleepfix 组
+    let hasSleepFixBone = false;
+    let rootIndex = -1;
+
     // 给左右手添加定位点
     let bones = modelJson["minecraft:geometry"][0]["bones"];
     for (let i = bones.length - 1; i >= 0; i--) {
@@ -67,6 +71,14 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
             );
         } else if (bone["name"] === "UpBody") {
             upBodyIndex = i;
+        } else if (bone["name"] === "sleepfix") {
+            hasSleepFixBone = true;
+            Blockbench.notification(
+                "提示：",
+                "当前模型已经包含了 sleepfix 组，插件无法再添加 sleepfix 组"
+            );
+        } else if (bone["name"] === "Root") {
+            rootIndex = i;
         }
     }
 
@@ -90,6 +102,31 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
             bones.splice(upBodyIndex, 0, waist);
         }
     }
+
+    // 添加 sleepfix 组
+    if (!hasSleepFixBone) {
+        if (rootIndex < 0) {
+            Blockbench.notification(
+                "提示：",
+                "当前模型缺少 Root 组，插件无法添加 sleepfix 组"
+            );
+        } else if (bones[rootIndex]["name"] === "Root") {
+            let parent = bones[rootIndex]["parent"];
+            bones[rootIndex]["parent"] = "sleepfix";
+
+            let sleepFix = {
+                "name": "sleepfix",
+                "pivot": bones[rootIndex]["pivot"]
+            };
+
+            if (parent) {
+                sleepFix["parent"] = parent;
+            }
+
+            bones.splice(rootIndex, 0, sleepFix);
+        }
+    }
+
 
     fs.writeFileSync(destModelPath, compileJSON(modelJson));
 }
