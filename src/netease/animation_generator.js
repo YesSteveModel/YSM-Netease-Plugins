@@ -216,6 +216,13 @@ export function animationTransformGenerator(srcPath, destPath, modelId, guiAnima
     handleGuiAnimation(tmpGuiAnimations, guiAnimationName, transformAnimations, modelId);
     // 检查是否有 paperdoll 动画，没有就复用 GUI 动画
     transformAnimations[`animation.${modelId}.paperdoll`] ??= transformAnimations[`animation.${modelId}.gui`];
+    // 添加 sleepfix 动画
+    transformAnimations[`animation.${modelId}.sleep_fix`] ??= {
+        "loop": true,
+        "bones": {"sleepfix": {"rotation": [-90, 0, 0]}}
+    };
+    // 把 sleepfix 移动到 sleep 之后
+    transformAnimations = moveKeyAfter(transformAnimations, `animation.${modelId}.sleep_fix`, `animation.${modelId}.sleep`);
     // 动画替换
     srcAnimationJson["animations"] = transformAnimations;
     // 删除多余的 geckolib_format_version 字段
@@ -287,4 +294,22 @@ export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, mod
     fs.writeFileSync(destPath, compileJSON(srcAnimationJson));
     // 返回变量
     return extraAnimation;
+}
+
+function moveKeyAfter(obj, keyToMove, keyAfter) {
+    if (!(keyToMove in obj) || !(keyAfter in obj)) {
+        console.error("Both keys must exist in the object!");
+        return obj;
+    }
+
+    const newObj = {};
+    const keys = Object.keys(obj);
+    for (let key of keys) {
+        if (key === keyToMove) continue;
+        newObj[key] = obj[key];
+        if (key === keyAfter) {
+            newObj[keyToMove] = obj[keyToMove];
+        }
+    }
+    return newObj;
 }

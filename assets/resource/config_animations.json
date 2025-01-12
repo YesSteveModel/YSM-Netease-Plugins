@@ -169,7 +169,7 @@
   ],
   [
     "sleep_fix",
-    "animation.sleep_fix"
+    "animation.%model_id%.sleep_fix"
   ],
   [
     "lean",
