@@ -71,35 +71,16 @@ export function behaviorPackGenerator(behaviorPackPath, modelId) {
 /**
  * ├───animations
  * ├───animation_controllers
- * ├───attachables
- * ├───effects
  * ├───entity
- * ├───font
  * ├───materials
  * ├───models
- * │   ├───animation
- * │   ├───editor_materials
- * │   ├───effect
- * │   ├───entity
- * │   ├───geometry
- * │   ├───mesh
- * │   ├───netease_block
- * │   └───skeleton
+ * │   └───entity
  * ├───render_controllers
- * ├───shaders
- * │   └───glsl
- * ├───sounds
- * ├───texts
- * ├───textures
- * │   ├───blocks
- * │   ├───entity
- * │   │   └───${}
- * │   ├───items
- * │   ├───models
- * │   ├───particle
- * │   ├───sfxs
- * │   └───ui
- * └───ui
+ * └───textures
+ *     ├───entity
+ *     │   └───${}
+ *     └───ui
+ *
  * resourcePackPath
  */
 export function resourcePackGenerator(resourcePackPath, modelId) {
@@ -109,9 +90,10 @@ export function resourcePackGenerator(resourcePackPath, modelId) {
     mkdirSync(pathJoin(resourcePackPath, "animation_controllers"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "entity"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "materials"), {recursive: true});
-    mkdirSync(pathJoin(resourcePackPath, "models", "entity",), {recursive: true});
+    mkdirSync(pathJoin(resourcePackPath, "models", "entity"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "render_controllers"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "textures", "entity", modelId), {recursive: true});
+    mkdirSync(pathJoin(resourcePackPath, "textures", "ui", modelId), {recursive: true});
 
     // 生成随机的 pack_manifest.json
     let copyPackManifest = JSON.parse(JSON.stringify(resourcePackManifest));
