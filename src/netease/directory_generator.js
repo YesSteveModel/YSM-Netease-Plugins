@@ -72,10 +72,10 @@ export function behaviorPackGenerator(behaviorPackPath, modelId) {
  * ├───animations
  * ├───animation_controllers
  * ├───entity
- * ├───materials
  * ├───models
  * │   └───entity
  * ├───render_controllers
+ * ├───shaders
  * └───textures
  *     ├───entity
  *     │   └───${}
@@ -89,9 +89,9 @@ export function resourcePackGenerator(resourcePackPath, modelId) {
     mkdirSync(pathJoin(resourcePackPath, "animations"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "animation_controllers"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "entity"), {recursive: true});
-    mkdirSync(pathJoin(resourcePackPath, "materials"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "models", "entity"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "render_controllers"), {recursive: true});
+    mkdirSync(pathJoin(resourcePackPath, "shaders"), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "textures", "entity", modelId), {recursive: true});
     mkdirSync(pathJoin(resourcePackPath, "textures", "ui", modelId), {recursive: true});
 
