@@ -55,7 +55,7 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
                 "parent": "RightHandLocator",
                 "pivot": bone["pivot"],
                 "locators": {
-                    "lead_holder": bone["pivot"]
+                    "lead_hold": bone["pivot"]
                 }
             };
             bones.splice(i + 1, 0, newBone);
