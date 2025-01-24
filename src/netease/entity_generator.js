@@ -41,7 +41,7 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
     let hasWaistBone = false;
     let upBodyIndex = -1;
 
-    // 模型需要添加 sleepfix 组
+    // 模型需要添加 sleepfix/root_pos 组
     let hasSleepFixBone = false;
     let rootIndex = -1;
 
@@ -53,7 +53,10 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
             let newBone = {
                 "name": "rightItem",
                 "parent": "RightHandLocator",
-                "pivot": bone["pivot"]
+                "pivot": bone["pivot"],
+                "locators": {
+                    "lead_holder": bone["pivot"]
+                }
             };
             bones.splice(i + 1, 0, newBone);
         } else if (bone["name"] === "LeftHandLocator") {
@@ -71,11 +74,11 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
             );
         } else if (bone["name"] === "UpBody") {
             upBodyIndex = i;
-        } else if (bone["name"] === "sleepfix") {
+        } else if (bone["name"] === "sleepfix" || bone["name"] === "root_pos") {
             hasSleepFixBone = true;
             Blockbench.notification(
                 "提示：",
-                "当前模型已经包含了 sleepfix 组，插件无法再添加 sleepfix 组"
+                "当前模型已经包含了 sleepfix/root_pos 组，插件无法再添加 sleepfix/root_pos 组"
             );
         } else if (bone["name"] === "Root") {
             rootIndex = i;
@@ -114,16 +117,23 @@ export function entityModelGenerator(srcModelPath, destModelPath, modelId) {
             let parent = bones[rootIndex]["parent"];
             bones[rootIndex]["parent"] = "sleepfix";
 
+            let rootPos = {
+                "name": "root_pos",
+                "pivot": bones[rootIndex]["pivot"]
+            };
+
             let sleepFix = {
+                "parent": "root_pos",
                 "name": "sleepfix",
                 "pivot": bones[rootIndex]["pivot"]
             };
 
             if (parent) {
-                sleepFix["parent"] = parent;
+                rootPos["parent"] = parent;
             }
 
             bones.splice(rootIndex, 0, sleepFix);
+            bones.splice(rootIndex, 0, rootPos);
         }
     }
 
