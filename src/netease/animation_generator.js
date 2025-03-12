@@ -242,7 +242,18 @@ export function extraAnimationTransformGenerator(srcPath, destPath, ysmJson, mod
         let index = 0;
         for (let key in rawExtraAnimation) {
             // 原动画名：[轮盘显示名称 新动画名]
-            extraAnimation[key] = [rawExtraAnimation[key], `extra${index}`];
+            let displayName = rawExtraAnimation[key];
+            // # 开头的动画是带有配置功能的
+            if (displayName.startsWith("#")) {
+                extraAnimation[`button${index}`] = [`button${index}`, displayName];
+                // 中国版的配置和动画播放功能的独立开的，所以还要把动画额外加进去
+                // 但是 # 开头的名字，不知为何不显示
+                extraAnimation[key] = [`extra${index}`, `extra${index}`];
+            } else {
+                // 有些人的 display name 是空的
+                displayName = displayName ? displayName : `extra${index}`;
+                extraAnimation[key] = [displayName, `extra${index}`];
+            }
             index++;
         }
     } else {

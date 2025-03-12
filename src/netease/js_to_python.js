@@ -25,7 +25,9 @@ export function jsToPythonConfig(obj, forceTuple = false) {
             // 这些是需要生成为元组的类型
             if (key === "animations" || key === "animation_controllers"
                 || key === "animate" || key === "render_controllers"
-                || key === "extra" || key === "preview_animation") {
+                || key === "extra" || key === "preview_animation"
+                || key === "labels"
+            ) {
                 return `"${key}": [${jsToPythonConfig(value, true).slice(1, -1)}]`;
             }
             return `"${key}": ${jsToPythonConfig(value)}`;

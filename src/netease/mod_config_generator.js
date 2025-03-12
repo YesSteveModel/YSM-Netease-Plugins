@@ -145,6 +145,10 @@ function defaultSkinSwitchTransform(skinSwitch, ysmJson, modelId, defaultTexture
     }
     // 把轮盘动画全加上
     Object.values(extraAnimation).forEach(value => {
+        // # 开头的是配置
+        if (value[1].startsWith("#")) {
+            return;
+        }
         let newAnimationName = `animation.${modelId}.${value[1]}`;
         if (existAnimations.includes(newAnimationName)) {
             defaultAnimations.push([value[1], newAnimationName]);
@@ -152,6 +156,32 @@ function defaultSkinSwitchTransform(skinSwitch, ysmJson, modelId, defaultTexture
             defaultAnimations.push([value[1], `animation.commander.${value[1]}`]);
         }
     });
+
+    // 把轮盘配置全加上
+    let extraAnimationButtons = ysmJson["properties"]?.["extra_animation_buttons"] ?? [];
+    // 需要给 config_forms 里的东西加 id 字段，随机
+    for (let button of extraAnimationButtons) {
+        if (!Array.isArray(button["config_forms"])) {
+            continue;
+        }
+        for (let form of button["config_forms"]) {
+            form["id"] = crypto.randomUUID();
+            // 如果包含 labels，那么需要改成二维数组
+            let labels = form["labels"];
+            if (labels) {
+                let outputLabels = [];
+                Object.keys(labels).forEach(key => {
+                    let value = labels[key];
+                    outputLabels.push([key, value]);
+                });
+                form["labels"] = outputLabels;
+            }
+        }
+    }
+    // 如果不为空，加入其中
+    if (extraAnimationButtons && extraAnimationButtons.length > 0) {
+        defaultSkinSwitch["extra_animation_buttons"] = extraAnimationButtons;
+    }
 
     // 动画控制器列表
     let defaultAnimationController = defaultSkinSwitch["animation_controllers"];
@@ -173,10 +203,16 @@ function defaultSkinSwitchTransform(skinSwitch, ysmJson, modelId, defaultTexture
     Object.values(extraAnimation).map(value => {
         let displayAnimationName = value[0];
         let newAnimationName = value[1];
-        defaultExtraAnimation.push([
-            displayAnimationName,
-            `/playanimation @s ${newAnimationName} default 0 \\"query.vertical_speed>0.3||query.ground_speed>0.3||q.is_sneaking\\"`,
-        ]);
+        // # 开头的是配置
+        if (newAnimationName.startsWith("#")) {
+            // 原样写入
+            defaultExtraAnimation.push([displayAnimationName, newAnimationName]);
+        } else {
+            defaultExtraAnimation.push([
+                displayAnimationName,
+                `/playanimation @s ${newAnimationName} default 0 \\"query.vertical_speed>0.3||query.ground_speed>0.3||q.is_sneaking\\"`,
+            ]);
+        }
     });
 }
 
